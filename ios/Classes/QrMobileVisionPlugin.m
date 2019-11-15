@@ -191,7 +191,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         });
     }
      self->_isScanning = NO;
-     }
+    });
+}
 
 - (void)heartBeat {
     // TODO: implement
