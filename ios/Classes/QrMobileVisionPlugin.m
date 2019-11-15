@@ -25,6 +25,7 @@
 @property(readonly) CVPixelBufferRef volatile latestPixelBuffer;
 @property(readonly, nonatomic) CMVideoDimensions previewSize;
 
+@property(nonatomic, strong) GMVDetector *barcodeDetector;
 @property(nonatomic, copy) void (^onCodeAvailable)(NSString *);
 
 - (instancetype)initWithErrorRef:(NSError **)error;
@@ -78,6 +79,8 @@
     [_captureSession addInputWithNoConnections:input];
     [_captureSession addOutputWithNoConnections:output];
     [_captureSession addConnection:connection];
+
+    _barcodeDetector = [GMVDetector detectorOfType:GMVDetectorTypeBarcode options:nil];
     
     return self;
 }
@@ -129,14 +132,37 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         return;
     
     _isScanning = YES;
+
+    AVCaptureDevicePosition devicePosition = AVCaptureDevicePositionBack;
+    UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
+    // TODO: last known orientation?
+    GMVImageOrientation orientation = [GMVUtility imageOrientationFromOrientation:deviceOrientation withCaptureDevicePosition:devicePosition defaultDeviceOrientation:UIDeviceOrientationPortrait];
     
-    CVImageBufferRef imageBuf = CMSampleBufferGetImageBuffer(sampleBuffer);
+    NSDictionary *options = @{
+        GMVDetectorImageOrientation: @(orientation)
+    };
+    
+    UIImage *image = [UIImage imageWithCGImage:cgImageRef];
+    NSArray<GMVBarcodeFeature *> *barcodes = [_barcodeDetector featuresInImage:image options:options];
+    image = nil;
+    CGImageRelease(cgImageRef);
+
+    if (barcodes.count > 0) {
+        GMVBarcodeFeature *barcode0 = barcodes[0];
+        NSString * value = [barcode0 rawValue];
+        NSLog(@"Detected barcode: %@", value);
+        dispatch_async(_mainQueue, ^{
+            self->_onCodeAvailable(value);
+        });
+    }
+    
+  /*  CVImageBufferRef imageBuf = CMSampleBufferGetImageBuffer(sampleBuffer);
     CIImage* frame = [CIImage imageWithCVImageBuffer: imageBuf];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSArray<CIFeature *> *features = nil;
         @autoreleasepool {
-            CIDetector *barcodeDetector = [CIDetector detectorOfType:CIDetectorTypeBarCode
+            CIDetector *barcodeDetector = [CIDetector detectorOfType:CIDetectorTypeQRCode
                                                              context:nil
                                                              options:nil];
             features = [barcodeDetector featuresInImage:frame];
@@ -151,7 +177,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
             });
         }
         
-        self->_isScanning = NO;
+        self->_isScanning = NO;*/
     });
     
     
