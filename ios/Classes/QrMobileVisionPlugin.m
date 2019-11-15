@@ -296,7 +296,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     }
 
     NSObject<FlutterTextureRegistry> * __weak registry = _registry;
-    textureId = [_registry registerTexture:_reader];
+    _textureId = [_registry registerTexture:_reader];
     QrMobileVisionPlugin * __weak weakSelf = self;
     _reader.onFrameAvailable = ^{
       QrMobileVisionPlugin *strongSelf = weakSelf;
@@ -313,7 +313,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [_reader start];
 
     ///////// texture, width, height
-    completedCallback(_reader.previewSize.width, _reader.previewSize.height, 0, textureId);
+    completedCallback(_reader.previewSize.width, _reader.previewSize.height, 0, _textureId);
 }
 
 - (void)stop {

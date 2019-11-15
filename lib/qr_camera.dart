@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:html' as prefix0;
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:native_device_orientation/native_device_orientation.dart';
 import 'package:qr_mobile_vision/qr_mobile_vision.dart';
+import 'package:torch/torch.dart';
 
 final WidgetBuilder _defaultNotStartedBuilder = (context) => new Text("Camera Loading ...");
 final WidgetBuilder _defaultOffscreenBuilder = (context) => new Text("Camera Paused.");
@@ -41,7 +43,11 @@ class QrCamera extends StatefulWidget {
   final List<BarcodeFormats> formats;
 
   toggleFlash() {
+    if(Platform.isAndroid){
     QrMobileVision.toggleFlash();
+    }else{
+      Torch.turnOn();
+    }
   }
 
   @override
