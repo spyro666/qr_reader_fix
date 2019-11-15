@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -40,6 +39,10 @@ class QrCamera extends StatefulWidget {
   final WidgetBuilder offscreenBuilder;
   final ErrorCallback onError;
   final List<BarcodeFormats> formats;
+
+  toggleFlash() {
+    QrMobileVision.toggleFlash();
+  }
 
   @override
   QrCameraState createState() => new QrCameraState();

@@ -13,7 +13,9 @@ Plugin for reading QR codes using Google&#x27;s Mobile Vision API.
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
   
-  s.ios.deployment_target = '9.0'
+  s.ios.deployment_target = '8.0'
+  
+  s.dependency 'GoogleMobileVision/BarcodeDetector'
   
   s.static_framework = true
 end
