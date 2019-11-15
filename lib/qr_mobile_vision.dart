@@ -69,10 +69,6 @@ class QrMobileVision {
     return _channel.invokeMethod('stop').catchError(print);
   }
 
-  static Future toggleFlash() {
-    return _channel.invokeMethod('toggleFlash').catchError(print);
-  }
-
   static Future heartbeat() {
     return _channel.invokeMethod('heartbeat').catchError(print);
   }
